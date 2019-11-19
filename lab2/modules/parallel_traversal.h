@@ -6,6 +6,15 @@
 #include <vector>
 #include "output.h"
 
+template <typename T, size_t S>
+void check(const std::array<T, S>& array) {
+  for (int i = 0; i < array.size(); i++) {
+    if (array[i] != 1) {
+      std::cout << i << std::endl;
+    }
+  }
+  std::cout << "End checking" << std::endl;
+}
 
 template <typename T, size_t S>
 bool mutex_increment(std::array<T, S>& array, size_t& index, std::mutex& mutex, int sleep_time) {
@@ -56,6 +65,7 @@ void atomic_execution(int num_thread, int sleep_time = 0) {
       thread.join();
     }
   }
+  check(array);
   // std::cout << array;
 }
 
@@ -77,6 +87,7 @@ void mutex_execution(int num_thread, int sleep_time = 0) {
       thread.join();
     }
   }
+  check(array);
    // std::cout << array;
 }
 
