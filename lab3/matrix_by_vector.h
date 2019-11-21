@@ -21,7 +21,7 @@ std::pair<std::vector<std::vector<int>>, std::vector<int>> initialize(size_t n, 
   return std::make_pair(matrix, vector);
 }
 
-void single_thread_matrix(const std::vector<std::vector<int>>& matrix, const std::vector<int>& vector) {
+double single_thread_matrix(const std::vector<std::vector<int>>& matrix, const std::vector<int>& vector) {
   auto start = std::chrono::high_resolution_clock::now();
   std::vector<int> result(matrix.size(), 0);
   for (int i = 0; i < matrix.size(); i++) {
@@ -33,12 +33,14 @@ void single_thread_matrix(const std::vector<std::vector<int>>& matrix, const std
 //  for (const auto& i : result) {
 //    std::cout << i << " ";
 //  }
+  double duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() * 1e-9;
   std::cout << std::endl << "Time for single_thread computation: "
-            << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() * 1e-9 << " sec"
+            << duration << " sec"
             << std::endl;
+  return duration;
 }
 
-void parallel_matrix(const std::vector<std::vector<int>>& matrix, const std::vector<int>& vector) {
+double parallel_matrix(const std::vector<std::vector<int>>& matrix, const std::vector<int>& vector) {
   auto start = std::chrono::high_resolution_clock::now();
   std::vector<int> result(matrix.size(), 0);
 #pragma omp parallel for collapse(2)
@@ -51,15 +53,18 @@ void parallel_matrix(const std::vector<std::vector<int>>& matrix, const std::vec
 //  for (const auto& i : result) {
 //    std::cout << i << " ";
 //  }
+  double duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() * 1e-9;
   std::cout << std::endl << "Time for parallel computation: "
-            << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() * 1e-9 << " sec"
+            << duration << " sec"
             << std::endl;
+  return duration;
 }
 
 void test_matrix_by_vector(size_t n, size_t m) {
   std::vector<std::vector<int>> matrix;
   std::vector<int> vector;
   std::tie(matrix, vector) = initialize(n, m);
-  single_thread_matrix(matrix, vector);
-  parallel_matrix(matrix, vector);
+  double a = single_thread_matrix(matrix, vector);
+  double b = parallel_matrix(matrix, vector);
+  std::cout << "Boost: " << a / b;
 }

@@ -6,7 +6,7 @@
 
 
 template <typename T>
-class FixedAtomicQueue {
+class LockFreeFixedAtomicQueue {
  private:
   std::vector<T> array;
   std::atomic_size_t head, tail, size;
@@ -15,7 +15,7 @@ class FixedAtomicQueue {
   std::atomic_bool free;
 
  public:
-  FixedAtomicQueue(size_t size) : free(true), head(0), tail(0), size(0) {
+  LockFreeFixedAtomicQueue(size_t size) : free(true), head(0), tail(0), size(0) {
     array.resize(size);
   }
 
@@ -24,7 +24,7 @@ class FixedAtomicQueue {
 };
 
 template<typename T>
-void FixedAtomicQueue<T>::push(T val) {
+void LockFreeFixedAtomicQueue<T>::push(T val) {
   while (true) {
     bool required = true;
     bool is_free = free.compare_exchange_strong(required, false);
@@ -50,7 +50,7 @@ void FixedAtomicQueue<T>::push(T val) {
 }
 
 template <typename T>
-bool FixedAtomicQueue<T>::pop(T &val) {
+bool LockFreeFixedAtomicQueue<T>::pop(T &val) {
   bool result = false;
   bool required = true;
   bool is_free = free.compare_exchange_strong(required, false);
